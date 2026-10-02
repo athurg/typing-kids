@@ -1,0 +1,88 @@
+# 自动构建 打字小能手.app
+# - 推送到 main / 提 PR / 手动运行：构建并上传压缩包（在运行详情页的 Artifacts 里下载）
+# - 推送 v* 标签（如 v1.0.1）：额外创建 GitHub Release，附上压缩包
+name: 构建 App
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths-ignore: ["README.md"]
+  pull_request:
+    paths-ignore: ["README.md"]
+  workflow_dispatch:
+
+# 同一个分支有新的提交时，取消还在跑的旧构建
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # 创建 Release 需要
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 需要完整历史和标签来计算版本号、构建号
+
+      - name: 环境信息
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+
+      - name: 编译并打包
+        id: build
+        env:
+          UNIVERSAL: "1"   # 同时支持 Apple 芯片和 Intel
+          ZIP: "1"
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            export VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          ./build_app.sh
+
+      - name: 检查 App 包
+        run: |
+          APP="build/打字小能手.app"
+          lipo -info "$APP/Contents/MacOS/TypingKids"
+          codesign --verify --verbose "$APP"
+          plutil -p "$APP/Contents/Info.plist" | grep -E "ShortVersion|CFBundleVersion"
+          echo "语音录音：$(ls "$APP/Contents/Resources/Voices" | wc -l) 个"
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: TypingKids-${{ steps.build.outputs.version }}
+          path: ${{ steps.build.outputs.zip }}
+          if-no-files-found: error
+
+      - name: 发布 Release（仅标签）
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ZIP: ${{ steps.build.outputs.zip }}
+        run: |
+          cat > build/release-notes.md <<'EOF'
+          ## 安装
+
+          1. 下载下面的 `TypingKids-*.zip`，双击解压得到「打字小能手.app」
+          2. 拖到「应用程序」文件夹
+          3. 第一次打开时，macOS 可能提示“无法验证开发者”：在 App 上**右键 → 打开**，再点“打开”即可
+             （或在终端运行 `xattr -dr com.apple.quarantine "/Applications/打字小能手.app"`）
+
+          需要 macOS 14 或更高版本，支持 Apple 芯片和 Intel。
+          EOF
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$ZIP" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$ZIP" \
+              --title "打字小能手 $GITHUB_REF_NAME" \
+              --notes-file build/release-notes.md \
+              --generate-notes
+          fi
