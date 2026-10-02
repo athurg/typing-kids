@@ -72,14 +72,14 @@ cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 PLIST
 
 codesign --force --sign - "$BUNDLE" >/dev/null
-echo "✅ 完成：$BUNDLE（版本 ${VERSION}，构建 ${BUILD_NUMBER}）"
+echo "✅ 完成：${BUNDLE}（版本 ${VERSION}，构建 ${BUILD_NUMBER}）"
 
 if [ "${ZIP:-0}" = "1" ]; then
     ZIP_PATH="build/TypingKids-${VERSION}.zip"
     rm -f "$ZIP_PATH"
     # ditto 打包能保留 App 包的权限和签名
     ditto -c -k --keepParent "$BUNDLE" "$ZIP_PATH"
-    echo "📦 压缩包：$ZIP_PATH"
+    echo "📦 压缩包：${ZIP_PATH}"
     # 给 CI 用：把压缩包路径写到 GitHub Actions 的输出里
     if [ -n "${GITHUB_OUTPUT:-}" ]; then
         echo "zip=$ZIP_PATH" >> "$GITHUB_OUTPUT"
