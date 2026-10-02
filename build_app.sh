@@ -19,19 +19,19 @@ if [ ! -f build/AppIcon.icns ]; then
     iconutil -c icns build/AppIcon.iconset -o build/AppIcon.icns
 fi
 
-echo "▶ 录制语音台词（只录新增的）…"
-# 第三方 App 不能直接调用 Siri 自然语音，所以打包时用 swift 解释器预先录好
+echo "▶ 检查语音录音（只补录缺少的）…"
+# 第三方 App 不能直接调用 Siri 自然语音，所以用 swift 解释器预先录好，录音提交在 Resources/Voices
 cat Sources/TypingKids/Support/VoiceLines.swift Scripts/make_voices.swift > build/_make_voices.swift
-swift build/_make_voices.swift build/Voices
+swift build/_make_voices.swift Resources/Voices
 
 echo "▶ 打包 ${BUNDLE}…"
 rm -rf "$BUNDLE"
 mkdir -p "$BUNDLE/Contents/MacOS" "$BUNDLE/Contents/Resources"
 cp "$BIN_DIR/$EXEC_NAME" "$BUNDLE/Contents/MacOS/$EXEC_NAME"
 cp build/AppIcon.icns "$BUNDLE/Contents/Resources/AppIcon.icns"
-if ls build/Voices/*.m4a >/dev/null 2>&1; then
+if ls Resources/Voices/*.m4a >/dev/null 2>&1; then
     mkdir -p "$BUNDLE/Contents/Resources/Voices"
-    cp build/Voices/*.m4a "$BUNDLE/Contents/Resources/Voices/"
+    cp Resources/Voices/*.m4a "$BUNDLE/Contents/Resources/Voices/"
 fi
 
 cat > "$BUNDLE/Contents/Info.plist" <<PLIST
