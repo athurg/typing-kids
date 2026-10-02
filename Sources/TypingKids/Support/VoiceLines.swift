@@ -30,8 +30,6 @@ enum VoiceLines {
     static let gameNewHigh = "新纪录！你太棒了！"
     static let preview = "你好呀！我们一起来练习打字吧。你真棒！"
     static let pianoDone = "弹完啦，真好听！我们一起来听一遍吧。"
-    static let frogSplash = "扑通！没关系，再跳一次！"
-    static let frogStart = "小青蛙要过河啦，加油！"
     static let ghostStart = "小幽灵来啦！小火龙，准备喷火！"
     static let ghostWin = "幽灵全被打跑啦，你赢了！"
     static let ghostLose = "哎呀，幽灵碰到小龙了！没关系，再来一次！"
@@ -53,7 +51,7 @@ enum VoiceLines {
 
     /// 需要预先录好的全部台词
     static var all: [String] {
-        praise + comfort + start + [newBest, gameOver, gameNewHigh, preview, pianoDone, frogSplash, frogStart,
+        praise + comfort + start + [newBest, gameOver, gameNewHigh, preview, pianoDone,
                                        ghostStart, ghostWin, ghostLose]
             + (0...100).map(scoreLine)
             + stride(from: 10, through: 210, by: 10).map(comboLine)
