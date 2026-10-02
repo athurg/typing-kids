@@ -23,6 +23,13 @@ let marker = outDir.appendingPathComponent("voice.txt")
 let recordedWith = (try? String(contentsOf: marker, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
 let requestedID = ProcessInfo.processInfo.environment["VOICE_ID"]
 
+// 录音已经齐全（比如 CI 上直接用仓库里提交的录音）就直接结束，不去碰语音合成
+let allFiles = Set(VoiceLines.all.map { VoiceLines.fileName(for: $0) + ".m4a" })
+if requestedID == nil, allFiles.allSatisfy({ fm.fileExists(atPath: outDir.appendingPathComponent($0).path) }) {
+    print("🎙  语音录音齐全，共 \(allFiles.count) 句（\(recordedWith ?? "未知语音")）")
+    exit(0)
+}
+
 let best = AVSpeechSynthesisVoice.speechVoices()
     .filter { $0.language == "zh-CN" && !$0.identifier.contains("eloquence") }
     .max { rank($0) < rank($1) }

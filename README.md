@@ -13,6 +13,16 @@ open "build/打字小能手.app"
 
 要求：macOS 14 及以上。
 
+`build_app.sh` 可选环境变量：`VERSION`（版本号，默认取最近的 git 标签）、`BUILD_NUMBER`（默认是提交次数）、`UNIVERSAL=1`（同时编译 Apple 芯片和 Intel）、`ZIP=1`（额外生成 `build/TypingKids-<版本>.zip`）。
+
+## 自动构建（GitHub Actions）
+
+`.github/workflows/build.yml`：
+
+- 推送到 `main`、提 PR、或在 Actions 页面手动运行：自动构建通用版 App，压缩包在该次运行的 **Artifacts** 里下载
+- 推送 `v*` 标签（如 `git tag v1.0.1 && git push origin v1.0.1`）：额外自动创建 **Release**，附上压缩包和安装说明
+- App 只做了临时签名（没有 Apple 开发者证书），第一次打开需要 **右键 → 打开**
+
 ## 功能
 
 - **打字练习区**：
