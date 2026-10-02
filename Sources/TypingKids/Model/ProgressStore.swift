@@ -81,6 +81,18 @@ final class ProgressStore {
         return isNew
     }
 
+    /// 记录一局用时越短越好的游戏（打幽灵记最快通关秒数），返回是否是新纪录。
+    @discardableResult
+    func recordFastest(_ gameID: String, seconds: Double) -> Bool {
+        totalSeconds += seconds
+        let rounded = max(1, Int(seconds.rounded()))
+        let best = gameHighScore(gameID)
+        let isNew = best == 0 || rounded < best
+        if isNew { gameScores[gameID] = rounded }
+        save()
+        return isNew
+    }
+
     func reset() {
         records = [:]
         gameScores = [:]

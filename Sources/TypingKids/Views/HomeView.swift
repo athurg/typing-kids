@@ -54,6 +54,7 @@ struct HomeView: View {
         switch game {
         case .piano: return ("\(best)%", "最高弹对率")
         case .frog: return ("\(best)", "最多荷叶")
+        case .ghost: return ("\(best)秒", "最快通关")
         default: return ("\(best)", "最高分")
         }
     }

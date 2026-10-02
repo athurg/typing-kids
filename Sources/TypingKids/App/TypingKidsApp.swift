@@ -103,6 +103,7 @@ struct RootView: View {
                     case .piano: PianoGameView(onExit: { go(.home) })
                     case .bubbles: BubbleGameView(onExit: { go(.home) })
                     case .frog: FrogGameView(onExit: { go(.home) })
+                    case .ghost: GhostGameView(onExit: { go(.home) })
                     }
                 }
                 .transition(.opacity)

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 打字游戏区的游戏
 enum GameKind: String, CaseIterable, Identifiable {
-    case balloon, piano, bubbles, frog
+    case balloon, piano, bubbles, frog, ghost
 
     var id: String { rawValue }
 
@@ -12,6 +12,7 @@ enum GameKind: String, CaseIterable, Identifiable {
         case .piano: "键盘钢琴"
         case .bubbles: "拼音泡泡"
         case .frog: "青蛙过河"
+        case .ghost: "打幽灵"
         }
     }
 
@@ -21,6 +22,7 @@ enum GameKind: String, CaseIterable, Identifiable {
         case .piano: "🎹"
         case .bubbles: "🫧"
         case .frog: "🐸"
+        case .ghost: "👻"
         }
     }
 
@@ -30,6 +32,7 @@ enum GameKind: String, CaseIterable, Identifiable {
         case .piano: "用基准键弹儿歌"
         case .bubbles: "打出拼音，戳破汉字泡泡"
         case .frog: "打对字母，青蛙跳过河"
+        case .ghost: "小龙喷火，赶跑幽灵"
         }
     }
 
@@ -39,6 +42,7 @@ enum GameKind: String, CaseIterable, Identifiable {
         case .piano: [Color(red: 0.55, green: 0.45, blue: 0.95), Color(red: 0.38, green: 0.30, blue: 0.80)]
         case .bubbles: [Color(red: 0.30, green: 0.78, blue: 0.95), Color(red: 0.25, green: 0.55, blue: 0.95)]
         case .frog: [Color(red: 0.40, green: 0.80, blue: 0.35), Color(red: 0.15, green: 0.62, blue: 0.45)]
+        case .ghost: [Color(red: 0.32, green: 0.30, blue: 0.62), Color(red: 0.14, green: 0.16, blue: 0.40)]
         }
     }
 }
