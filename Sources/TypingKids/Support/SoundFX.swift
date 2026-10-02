@@ -16,8 +16,6 @@ enum SoundFX {
     case star(index: Int)
     /// 键盘钢琴的一个音
     case note(midi: Int)
-    /// 青蛙起跳
-    case jump
     /// 掉进水里
     case splash
     /// 小龙喷火球
@@ -66,8 +64,6 @@ enum SoundFX {
             }
         case .note(let midi):
             SoundEngine.shared.play("note\(midi)") { Synth.bell(midi: midi, duration: 0.9, volume: 0.4) }
-        case .jump:
-            SoundEngine.shared.play("jump") { Synth.sweep(from: 300, to: 700, duration: 0.15, volume: 0.35) }
         case .splash:
             SoundEngine.shared.play("splash") {
                 Synth.mix([(0, Synth.sweep(from: 600, to: 120, duration: 0.35, volume: 0.4)),

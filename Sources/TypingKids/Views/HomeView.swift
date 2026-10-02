@@ -53,7 +53,6 @@ struct HomeView: View {
         guard best > 0 else { return nil }
         switch game {
         case .piano: return ("\(best)%", "最高弹对率")
-        case .frog: return ("\(best)", "最多荷叶")
         case .ghost: return ("\(best)秒", "最快通关")
         default: return ("\(best)", "最高分")
         }
@@ -188,34 +187,63 @@ private struct TipTicker: View {
     ]
     private static let interval: Double = 4
 
+    @State private var index = 0
+
     var body: some View {
-        TimelineView(.periodic(from: .now, by: Self.interval)) { context in
-            let index = Int(context.date.timeIntervalSinceReferenceDate / Self.interval) % Self.tips.count
-            let tip = Self.tips[index]
-            HStack(spacing: 12) {
-                Text("💡 小贴士")
-                    .font(Theme.font(15, .heavy))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    .background(Capsule().fill(Theme.accent))
-                ZStack(alignment: .leading) {
-                    HStack(spacing: 8) {
-                        Text(tip.0)
-                        Text(tip.1)
-                    }
-                    .font(Theme.font(19, .semibold))
-                    .foregroundStyle(Theme.ink)
-                    .id(index)
-                    .transition(.push(from: .bottom))
+        let tip = Self.tips[index]
+        HStack(spacing: 12) {
+            Text("💡 小贴士")
+                .font(Theme.font(15, .heavy))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 5)
+                .background(Capsule().fill(Theme.accent))
+            ZStack(alignment: .leading) {
+                HStack(spacing: 8) {
+                    Text(tip.0)
+                    Text(tip.1)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .clipped()
-                .animation(.spring(duration: 0.6), value: index)
+                .font(Theme.font(19, .semibold))
+                .foregroundStyle(Theme.ink)
+                .id(index)
+                .transition(.push(from: .bottom))
             }
-            .padding(.horizontal, 18)
-            .frame(height: 50)
-            .background(Capsule().fill(.white.opacity(0.85)))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .clipped()
+            .animation(.spring(duration: 0.6), value: index)
+            nextButton
         }
+        .padding(.leading, 18)
+        .padding(.trailing, 8)
+        .frame(height: 50)
+        .background(Capsule().fill(.white.opacity(0.85)))
+        // index 一变就重新计时，手动翻页后也会完整停留 4 秒
+        .task(id: index) {
+            try? await Task.sleep(for: .seconds(Self.interval))
+            if !Task.isCancelled { index = (index + 1) % Self.tips.count }
+        }
+    }
+
+    /// 翻到下一条：显示“第几条 / 共几条”，提示还有更多
+    private var nextButton: some View {
+        Button {
+            index = (index + 1) % Self.tips.count
+        } label: {
+            HStack(spacing: 6) {
+                Text("\(index + 1)/\(Self.tips.count)")
+                    .font(Theme.font(14, .bold))
+                    .monospacedDigit()
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 13, weight: .heavy))
+            }
+            .foregroundStyle(Theme.accent)
+            .padding(.horizontal, 12)
+            .frame(height: 34)
+            .background(Capsule().fill(Theme.accent.opacity(0.14)))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .focusable(false)
+        .help("下一条")
     }
 }
