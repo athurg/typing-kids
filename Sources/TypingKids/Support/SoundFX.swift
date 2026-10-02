@@ -20,6 +20,12 @@ enum SoundFX {
     case jump
     /// 掉进水里
     case splash
+    /// 小龙喷火球
+    case fireball
+    /// 火球打中幽灵
+    case ghostHit
+    /// 幽灵被打跑了
+    case ghostVanish
 
     static func play(_ fx: SoundFX) {
         guard UserDefaults.standard.object(forKey: "soundOn") as? Bool ?? true else { return }
@@ -66,6 +72,22 @@ enum SoundFX {
             SoundEngine.shared.play("splash") {
                 Synth.mix([(0, Synth.sweep(from: 600, to: 120, duration: 0.35, volume: 0.4)),
                            (0.05, Synth.noise(duration: 0.4, volume: 0.25))])
+            }
+        case .fireball:
+            SoundEngine.shared.play("fireball") {
+                Synth.mix([(0, Synth.noise(duration: 0.18, volume: 0.18)),
+                           (0, Synth.sweep(from: 220, to: 520, duration: 0.16, volume: 0.25))])
+            }
+        case .ghostHit:
+            SoundEngine.shared.play("ghostHit") {
+                Synth.mix([(0, Synth.sweep(from: 520, to: 180, duration: 0.14, volume: 0.4)),
+                           (0, Synth.noise(duration: 0.1, volume: 0.2))])
+            }
+        case .ghostVanish:
+            SoundEngine.shared.play("ghostVanish") {
+                Synth.mix([(0, Synth.sweep(from: 900, to: 250, duration: 0.45, volume: 0.3)),
+                           (0.1, Synth.bell(midi: 88, duration: 0.4, volume: 0.15)),
+                           (0.2, Synth.bell(midi: 91, duration: 0.4, volume: 0.15))])
             }
         case .star(let index):
             let notes = [79, 84, 88]
