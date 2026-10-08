@@ -5,8 +5,8 @@
 ## 运行
 
 ```bash
-./build_app.sh            # 生成 build/打字小能手.app
-open "build/打字小能手.app"
+./build_app.sh            # 生成 build/dzxns.app（显示名「打字小能手」）
+open "build/dzxns.app"
 ```
 
 开发调试时也可以直接 `swift run`，或用 Xcode 打开 `Package.swift`。
