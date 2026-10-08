@@ -49,7 +49,7 @@ jobs:
 
       - name: 检查 App 包
         run: |
-          APP="build/打字小能手.app"
+          APP="build/dzxns.app"
           lipo -info "$APP/Contents/MacOS/TypingKids"
           codesign --verify --verbose "$APP"
           plutil -p "$APP/Contents/Info.plist" | grep -E "ShortVersion|CFBundleVersion"
@@ -74,7 +74,7 @@ jobs:
           1. 下载下面的 `TypingKids-*.zip`，双击解压得到「打字小能手.app」
           2. 拖到「应用程序」文件夹
           3. 第一次打开时，macOS 可能提示“无法验证开发者”：在 App 上**右键 → 打开**，再点“打开”即可
-             （或在终端运行 `xattr -dr com.apple.quarantine "/Applications/打字小能手.app"`）
+             （或在终端运行 `xattr -dr com.apple.quarantine "/Applications/dzxns.app"`）
 
           需要 macOS 14 或更高版本，支持 Apple 芯片和 Intel。
           EOF

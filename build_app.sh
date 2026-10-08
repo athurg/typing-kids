@@ -1,5 +1,5 @@
 #!/bin/bash
-# 编译并打包成 build/打字小能手.app
+# 编译并打包成 build/dzxns.app（访达、启动台里显示为「打字小能手」）
 #
 # 可选环境变量：
 #   VERSION=1.2.0     版本号（默认取最近的 git 标签，如 v1.0.0 → 1.0.0）
@@ -11,7 +11,10 @@ cd "$(dirname "$0")"
 
 APP_NAME="打字小能手"
 EXEC_NAME="TypingKids"
-BUNDLE="build/${APP_NAME}.app"
+# 包的文件名用拼音首字母，Spotlight / 启动台搜 dzxns 就能找到；
+# Info.plist 里的名字必须和文件名一致，系统才会改用 InfoPlist.strings 里的中文名显示
+BUNDLE_NAME="dzxns"
+BUNDLE="build/${BUNDLE_NAME}.app"
 
 VERSION="${VERSION:-$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)}"
 VERSION="${VERSION:-1.0.0}"
@@ -41,7 +44,7 @@ cat Sources/TypingKids/Support/VoiceLines.swift Scripts/make_voices.swift > buil
 swift build/_make_voices.swift Resources/Voices
 
 echo "▶ 打包 ${BUNDLE}…"
-rm -rf "$BUNDLE"
+rm -rf "$BUNDLE" "build/${APP_NAME}.app"
 mkdir -p "$BUNDLE/Contents/MacOS" "$BUNDLE/Contents/Resources"
 cp "$BIN_DIR/$EXEC_NAME" "$BUNDLE/Contents/MacOS/$EXEC_NAME"
 cp build/AppIcon.icns "$BUNDLE/Contents/Resources/AppIcon.icns"
@@ -49,6 +52,11 @@ if ls Resources/Voices/*.m4a >/dev/null 2>&1; then
     mkdir -p "$BUNDLE/Contents/Resources/Voices"
     cp Resources/Voices/*.m4a "$BUNDLE/Contents/Resources/Voices/"
 fi
+for LPROJ in zh-Hans en; do
+    mkdir -p "$BUNDLE/Contents/Resources/${LPROJ}.lproj"
+    printf 'CFBundleName = "%s";\nCFBundleDisplayName = "%s";\n' "$APP_NAME" "$APP_NAME" \
+        > "$BUNDLE/Contents/Resources/${LPROJ}.lproj/InfoPlist.strings"
+done
 
 cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -57,13 +65,14 @@ cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 <dict>
     <key>CFBundleExecutable</key><string>${EXEC_NAME}</string>
     <key>CFBundleIdentifier</key><string>com.fengyiyi.typingkids</string>
-    <key>CFBundleName</key><string>${APP_NAME}</string>
-    <key>CFBundleDisplayName</key><string>${APP_NAME}</string>
+    <key>CFBundleName</key><string>${BUNDLE_NAME}</string>
+    <key>CFBundleDisplayName</key><string>${BUNDLE_NAME}</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>${VERSION}</string>
     <key>CFBundleVersion</key><string>${BUILD_NUMBER}</string>
     <key>CFBundleDevelopmentRegion</key><string>zh_CN</string>
+    <key>LSHasLocalizedDisplayName</key><true/>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSApplicationCategoryType</key><string>public.app-category.education</string>
     <key>NSHighResolutionCapable</key><true/>
